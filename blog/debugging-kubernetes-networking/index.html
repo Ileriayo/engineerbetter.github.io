@@ -1,0 +1,275 @@
+<!doctype html><html lang=pl><head><meta charset=utf-8><meta content="width=device-width,initial-scale=1" name=viewport><title>Debugging Kubernetes Networking | EngineerBetter | More than Cloud Platform specialists</title><link rel=stylesheet href="/css/main.css?v=4"><link rel=stylesheet href=/css/syntax.css><link rel=icon type=image/png href=/img/favicon.png><script>(function(e,t,n,s,o,i,a){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,i=t.createElement(n),a=t.getElementsByTagName(n)[0],i.async=1,i.src=s,a.parentNode.insertBefore(i,a)})(window,document,"script","//www.google-analytics.com/analytics.js","ga"),ga("create","UA-74442484-1","auto"),ga("send","pageview")</script><script src=//load.sumome.com/ data-sumo-site-id=7c63408cd1c29faa63d20123ff629d524df6674695e4305a0e602f2bbf431038 async></script>
+<script type=text/javascript>var _iub=_iub||[];_iub.csConfiguration={banner:{textColor:"#dadada",backgroundColor:"#5A5A5A"},lang:"en",siteId:939573,cookiePolicyId:8251825}</script><script type=text/javascript src=//cdn.iubenda.com/cookie_solution/safemode/iubenda_cs.js async></script></head><body><section id=menu-nav-top class="menu fixed-menu clearfix"><div class=menu_contact><p class=menu_contact-number>+44 (0) 20 7846 0140</p><a href=mailto:contact@engineerbetter.com class=menu_contact-us>Contact us</a></div><div class="menu_header clearfix"><button class=menu_header-button>
+<span class="icon-bar top-bar"></span>
+<span class="icon-bar middle-bar"></span>
+<span class="icon-bar bottom-bar"></span></button>
+<a href=/ class=menu_header-logo><img class=logo-header-img alt=Brand src=/img/engineer-better-logo.svg></a></div></section><div class=menu_list><button class=menu_list-close><p>&#x2716;</p></button><div class=menu_list-inner-wrap><p class=menu_list-phone>+44 (0) 20 7846 0140</p><a class=menu_list-contact-btn href=mailto:contact@engineerbetter.com>Contact us&nbsp;<span>&#xe900;</span></a><ul class=menu_list-links><li><a href=/how-we-work/>How we work</a></li><li><a href=/our-services/>Our services</a></li><li><a href=/success-stories/>Success stories</a></li><li><a href=/why-cloud-native/>why cloud-native?</a></li><li><a href=/about-us/>About us</a></li><li><a href=/blog/>Blog</a></li></ul><div class=menu_list-icons><a href=https://twitter.com/EngineerBetter><img src=/img/twitter.svg alt="Twitter profile"></a>
+<a href=https://github.com/EngineerBetter><img src=/img/github.svg alt="Github profile"></a></div><div class=menu_list-bot-menu><a href=/blog/>Blog</a><span>|</span><a href=/join-our-team/>Careers</a><span>|</span><a href=//www.iubenda.com/privacy-policy/8251825 class="iubenda-nostyle no-brand iubenda-embed" title="Privacy Policy">Privacy</a><script type=text/javascript>(function(e,t){var n=function(){var e=t.createElement("script"),n=t.getElementsByTagName("script")[0];e.src="//cdn.iubenda.com/iubenda.js",n.parentNode.insertBefore(e,n)};e.addEventListener?e.addEventListener("load",n,!1):e.attachEvent?e.attachEvent("onload",n):e.onload=n})(window,document)</script></div></div></div><section class="menu-banner-top_wrap parallax is-page"><div class=menu-banner-top><div class=menu-banner-top_contact><a class=menu-banner-top_number href="tel:+44 (0) 20 7846 0140">+44 (0) 20 7846 0140</a>
+<a class=menu-banner-top_contact-us href=mailto:contact@engineerbetter.com>Contact us</a></div><div class=menu-banner-top_btn-wrap><button class=menu_header-button>
+<span class="icon-bar top-bar"></span>
+<span class="icon-bar middle-bar"></span>
+<span class="icon-bar bottom-bar"></span></button></div><div class="menu-banner-top_logo clearfix"><a href=/ class=home-banner_logo-img><img class=logo-img alt=Brand src=/img/engineer-better-logo.svg></a></div></div><div class=home-banner><div class="home-banner_list clearfix"><div class=home-banner_list-category><ul><li><a href=ileri.com/how-we-work/>How we work</a></li><li><a href=ileri.com/our-services/>Our services</a></li><li><a href=ileri.com/success-stories/>Success Stories</a></li><li><a href=ileri.com/why-cloud-native/>Why Cloud-Native?</a></li><li><a href=ileri.com/about-us/>About us</a></li><li><a href=ileri.com/blog/>Blog</a></li></ul></div><div class=home-banner_textarea><h1 class=home-banner_textarea-header>Our <strong>blog&nbsp;<span>&#xe900;</span></strong></h1><div class=home-banner_textarea-wrap><p class=home-banner_textarea-description>Get the very latest updates about recent projects, team updates, thoughts and industry news from our team of EngineerBetter experts.</p></div></div></div></div></section><section class=blog-page><div class=blog-page_container><h1>Debugging Kubernetes Networking</h1><p class=blog-page_details>Apr 6, 2020<span>|</span> Daniel Jones and Jonathan Matthews</p><div class=blog-page_image><img src=/img/blog/down-the-rabbit-hole.jpg></div><p>At EngineerBetter, we&rsquo;re going through the formality of ensuring that we&rsquo;ve got the Certified Kubernetes Administrator qualification box ticked. Kelsey Hightower&rsquo;s <a href=https://github.com/kelseyhightower/kubernetes-the-hard-way>Kubernetes The Hard Way</a> is a valuable guide to setting up a Kubes cluster &lsquo;by hand&rsquo;, and so I set about running through it.</p><p>All was going smoothly (well, after I realised that I&rsquo;d screwed up the <code>kubeconfig</code> for <code>kube-proxy</code>, but that&rsquo;s another story). By the end of the walkthrough I had three controller VMs running the <code>api-server</code>, <code>etcd</code> and <code>scheduler</code>, and three workers running <code>kubelet</code> and <code>kube-proxy</code>. The guide invites you to deploy an NGiNX instance, and hook up a NodePort service to it.</p><p>EngineerBetter is a cloud computing and continuous delivery consultancy. We don&rsquo;t do front-end web development. Hence, some of the code samples in this article are <em>hideously</em> laid out, and I apologise for any emotional distress caused.</p><h2 id=dns-works-right>DNS works, right?</h2><p>A friend was asking how DNS works with regards to Services in Kubes, so I thought I&rsquo;d run through a quick demo. Spin up a pod, <code>curl</code> my NGiNX service by name, and demonstrate that resolving to the right place. Simple, right?</p><p>I had the NGiNX pod and service running:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>$ k get pods,services
+NAME                         READY   STATUS    RESTARTS   AGE
+pod/busybox                  1/1     Running   50         35d
+pod/nginx-554b9c67f9-7447p   1/1     Running   7          35d
+
+NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE
+service/kubernetes   ClusterIP   10.32.0.1     &lt;none&gt;        443/TCP        35d
+service/nginx        NodePort    10.32.0.23    &lt;none&gt;        80:32359/TCP   35d
+</code></pre><p>I created a throwaway test pod, based on an image we regularly use for debugging and CI:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>k run test --image engineerbetter/pcf-ops --restart=Never -it --rm  -- /bin/bash
+</code></pre><p>As expected, the image was pulled, the pod started, and my terminal session was attached to a freshly-spawned <code>bash</code> process inside. All that remained was to make an HTTP request from my machine to the NGiNX service running inside the cluster.</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# curl nginx
+curl: (6) Could not resolve host: nginx
+</code></pre><p>This is not what I expected, but sure, let&rsquo;s debug it! From this point on, Jonathan and I decided to go down the rabbit hole together.</p><p>The <code>curl</code> invocation was taking a while to fail:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# time curl nginx
+curl: (6) Could not resolve host: nginx
+
+real	0m10.530s
+user	0m0.005s
+sys	0m0.006s
+</code></pre><p>Timeout? That normally suggests that a firewall is dropping packets somewhere.</p><p>Let&rsquo;s try resolving the service domain using <code>nslookup</code>:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# nslookup nginx
+Server:  10.32.0.10
+Address: 10.32.0.10#53
+
+Name: nginx.default.svc.cluster.local
+Address: 10.32.0.23
+;; reply from unexpected source: 10.200.2.32#53, expected 10.32.0.10#53
+</code></pre><p>Okay, that&rsquo;s odd. That seems to have both found the answer <em>and</em> failed with an error message. Let&rsquo;s try again:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# nslookup nginx
+;; reply from unexpected source: 10.200.2.32#53, expected 10.32.0.10#53
+</code></pre><p>Oh dear. That&rsquo;s failed completely this time, despite us having changed nothing.</p><p>Okay, let&rsquo;s try looking up a <em>real</em> domain:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# nslookup engineerbetter.com
+Server:  10.32.0.10
+Address: 10.32.0.10#53
+
+** server can&#39;t find engineerbetter.com.c.dj-kthw3.internal: SERVFAIL
+</code></pre><p>Umm&mldr; That seems to be a completely different error. If the DNS server can&rsquo;t find the domain, then we <em>must</em> have been able to communicate with the DNS server correctly - which is a different problem entirely.</p><p>Was <em>this</em> issue also intermittent?</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# nslookup engineerbetter.com
+;; reply from unexpected source: 10.200.2.32#53, expected 10.32.0.10#53
+</code></pre><p>Yep. We&rsquo;re back to the first error message again.</p><p>Looks like we have two problems:</p><ol><li>DNS lookups for &lsquo;real&rsquo; external domains are failing to resolve</li><li>DNS lookups are intermittently failing, because responses are coming from an unexpected IP</li></ol><p>The first issue is way less weird than the second, so we decided to tackle the simpler issue initially.</p><h2 id=issue-1---external-resolution>Issue 1 - External Resolution</h2><p>So when we <em>can</em> talk to a DNS server, we&rsquo;re still getting error messages when looking up external domains:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# nslookup engineerbetter.com
+Server:  10.32.0.10
+Address: 10.32.0.10#53
+
+** server can&#39;t find engineerbetter.com.c.dj-kthw3.internal: SERVFAIL
+</code></pre><p>It looks like for whatever reason, it was trying to resolve <code>engineerbetter.com.c.dj-kthw3.internal</code> rather than just <code>engineerbetter.com</code>.</p><p>Where to look first? We checked <code>etc/resolv.conf</code>:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# cat /etc/resolv.conf
+search default.svc.cluster.local svc.cluster.local cluster.local c.dj-kthw3.internal google.internal
+nameserver 10.32.0.10
+options ndots:5
+</code></pre><p>This looks fairly sensible - that <code>nameserver</code> directive is pointing to an IP on the services subnet. A cursory check with <code>kubectl</code> confirms that yes, 10.32.0.10 <em>is</em> the Cluster IP of the CoreDNS service:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>$ k get pods,services -owide -n kube-system
+NAME                           READY   STATUS    RESTARTS   AGE   IP            NODE
+pod/coredns-656bc64dd7-bpz87   1/1     Running   3          29d   10.200.2.32   worker-2
+pod/coredns-656bc64dd7-f4b8b   1/1     Running   4          29d   10.200.1.41   worker-1
+
+NAME               TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE   SELECTOR
+service/kube-dns   ClusterIP   10.32.0.10   &lt;none&gt;        53/UDP,53/TCP,9153/TCP   35d   k8s-app=kube-dns
+</code></pre><p>What does <code>options ndots:5</code> do? This isn&rsquo;t something I&rsquo;d seen outside of Kubesland, and we found <a href=https://pracucci.com/kubernetes-dns-resolution-ndots-options-and-why-it-may-affect-application-performances.html>a great blog post about the ndots option in the context of Kubes DNS resolution</a>. After reading the afore-linked post, it was clear that this tells the resolver to <em>first</em> try iterating through all the local search domains if the name we&rsquo;re looking for has fewer than 5 dots in it. Interesting, but probably not relevant here.</p><p>By looking in <code>resolv.conf</code> we&rsquo;d ruled out any config pointing us towards nameservers <em>other</em> than the in-cluster <a href=https://github.com/kelseyhightower/kubernetes-the-hard-way/blob/master/deployments/coredns.yaml>CoreDNS, which <em>Kubernetes The Hard Way</em> has you install</a>. Off we went to review the logs in the two CoreDNS pods:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>[ERROR] plugin/errors: 2 nginx. A: plugin/loop: no next plugin found
+</code></pre><p>Does <em>Kubernetes The Hard Way</em> ever actually tell CoreDNS how to resolve external domains? It&rsquo;s not something in the critical path of the guide, so perhaps not?</p><p>In the YAML file pinned in the repo there&rsquo;s <a href=https://github.com/kelseyhightower/kubernetes-the-hard-way/blob/master/deployments/coredns.yaml#L48-L68>a ConfigMap that defines the CoreDNS configuration</a>.</p><p>There&rsquo;s nothing in that ConfigMap that tells CoreDNS about any outside DNS servers, so it looks like we&rsquo;ll have to add something.</p><h3 id=solution-1---forward--169254169254>Solution 1 - <code>forward . 169.254.169.254</code></h3><p>Reading The F&mldr;riendly <a href=https://coredns.io/plugins/forward/>(CoreDNS) Manual</a> yielded that we needed a simple one-liner to enable query forwarding. So, we edited the ConfigMap in-situ to add config for the <code>forward</code> plugin, telling it to defer to the Google Cloud internal DNS:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>apiVersion: v1
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+        }
+        prometheus :9153
+        cache 31
+        forward . 169.254.169.254
+        loop
+        reload
+        loadbalance
+    }
+kind: ConfigMap
+...
+</code></pre><p>We were already using <code>watch</code> to test external resolution by running <code>nslookup engineerbetter.com</code> every two seconds. Whilst I was busy trying to remember how to get Deployments to pick up ConfigMap changes, the command started succeeding. <em>Note to self:</em> CoreDNS handles reloading of ConfigMaps by itself.</p><p>One problem down, one to go!</p><h2 id=issue-2---reply-from-unexpected-source>Issue 2 - Reply from Unexpected Source</h2><p>With one issue resolved, let&rsquo;s revisit the other error messages we were getting.</p><p>In the first case, we saw:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@test:/# nslookup nginx
+Server:  10.32.0.10
+Address: 10.32.0.10#53
+
+Name: nginx.default.svc.cluster.local
+Address: 10.32.0.23
+;; reply from unexpected source: 10.200.2.32#53, expected 10.32.0.10#53
+</code></pre><p>This showed that some requests worked, and others failed. Unless we were particularly unlucky with cosmic rays flipping bits, this intermittent behaviour was likely down to some non-deterministic round-robin type behaviour. We noted earlier that there were two CoreDNS pods; maybe one was malfunctioning? We checked the CoreDNS logs, and nothing was obvious.</p><p>We decided to check what things were using the expected and unexpected IP addresses from the prior error message:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>$ k get pods,services -owide -n kube-system
+NAME                           READY   STATUS    RESTARTS   AGE   IP            NODE
+pod/coredns-656bc64dd7-bpz87   1/1     Running   3          29d   10.200.2.32   worker-2
+pod/coredns-656bc64dd7-f4b8b   1/1     Running   4          29d   10.200.1.41   worker-1
+
+NAME               TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE   SELECTOR
+service/kube-dns   ClusterIP   10.32.0.10   &lt;none&gt;        53/UDP,53/TCP,9153/TCP   35d   k8s-app=kube-dns
+</code></pre><p>You can see from the above that our test was expecting to hear back from the CoreDNS service&rsquo;s Cluster IP, but was actually getting responses from a pod IP.</p><p>We ran the test a few more times and noticed that, when running tests from this one pod, we only saw error messages specifying that <strong>the response had come from the CoreDNS pod on the same worker</strong>.</p><h3 id=traffic-to-services-backed-by-pods-on-the-same-worker>Traffic to services backed by pods on the same worker</h3><p>To prove that pod/worker locality was an issue, we stood up three pairs of pods - in each pair was one NGiNX pod, and one of our debug image. Each pair was then naively scheduled to a specific worker via <code>spec.nodeName</code>. We also created a Cluster IP service exposing each NGiNX pod.</p><pre tabindex=0><code class=language-terminal data-lang=terminal>$ kubectl get pods,services -owide
+NAME                          READY   STATUS    RESTARTS   AGE     IP            NODE
+pod/nginx0-7b45774556-tqfnl   1/1     Running   0          2m16s   10.200.0.49   worker-0
+pod/nginx1-647f775685-2blwx   1/1     Running   0          2m11s   10.200.1.42   worker-1
+pod/nginx2-7dddf444fd-5lxmw   1/1     Running   0          2m8s    10.200.2.65   worker-2
+pod/tmp0                      1/1     Running   0          15s     10.200.0.50   worker-0
+pod/tmp1                      1/1     Running   0          13s     10.200.1.43   worker-1
+pod/tmp2                      1/1     Running   0          11s     10.200.2.63   worker-2
+
+NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE     SELECTOR
+service/kubernetes   ClusterIP   10.32.0.1     &lt;none&gt;        443/TCP        35d     &lt;none&gt;
+service/nginx0       NodePort    10.32.0.100   &lt;none&gt;        80:32100/TCP   2m16s   app=nginx0
+service/nginx1       NodePort    10.32.0.101   &lt;none&gt;        80:32101/TCP   2m11s   app=nginx1
+service/nginx2       NodePort    10.32.0.102   &lt;none&gt;        80:32102/TCP   2m8s    app=nginx2
+</code></pre><p>We decided to test further by making HTTP requests to:</p><ul><li>Pod IP on a different worker</li><li>Cluster IP that is backed by a pod on a different worker</li><li>Pod IP on the same worker</li><li>Cluster IP that is backed by a pod on the same worker</li></ul><p>Hitting the pod IP and cluster IP both succeeded when the target pod was on a different worker: we got the NGiNX default index page as expected.</p><p>Hitting the pod IP succeeded when the target pod was on the same worker: again, we got the expected HTTP response.</p><p>Hitting the cluster IP when the target pod was on the same worker <em>failed</em>: instead of a HTTP response, <strong>we got a timeout</strong>.</p><p>The timeout thing is a bit odd. We&rsquo;d hadn&rsquo;t configured a single <code>NetworkPolicy</code>, so there&rsquo;s no reason that we&rsquo;d expect packets to be dropped. <code>netcat</code> also reported timeouts. What exactly was going on?</p><h3 id=tcpdump>tcpdump</h3><p>As with all good network debugging stories, we ended up resorting to running <code>tcpdump</code> on the affected worker. Here <code>-nn</code> prevents reverse-lookup of IP to hostname, <code>-i any</code> specifies that we want to examine all interfaces:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# tcpdump -i any -nn port 80
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on any, link-type LINUX_SLL (Linux cooked), capture size 262144 bytes
+18:02:52.563172 IP 10.200.2.63.58096 &gt; 10.32.0.102.80: Flags [S], seq 2511416864, win 64240, options [mss 1460,sackOK,TS val 2349838492 ecr 0,nop,wscale 7], length 0
+18:02:52.563172 IP 10.200.2.63.58096 &gt; 10.32.0.102.80: Flags [S], seq 2511416864, win 64240, options [mss 1460,sackOK,TS val 2349838492 ecr 0,nop,wscale 7], length 0
+18:02:52.563237 IP 10.200.2.63.58096 &gt; 10.200.2.65.80: Flags [S], seq 2511416864, win 64240, options [mss 1460,sackOK,TS val 2349838492 ecr 0,nop,wscale 7], length 0
+18:02:52.563240 IP 10.200.2.63.58096 &gt; 10.200.2.65.80: Flags [S], seq 2511416864, win 64240, options [mss 1460,sackOK,TS val 2349838492 ecr 0,nop,wscale 7], length 0
+18:02:52.563257 IP 10.200.2.65.80 &gt; 10.200.2.63.58096: Flags [S.], seq 1225769056, ack 2511416865, win 65160, options [mss 1460,sackOK,TS val 2003052615 ecr 2349838492,nop,wscale 7], length 0
+18:02:52.563260 IP 10.200.2.65.80 &gt; 10.200.2.63.58096: Flags [S.], seq 1225769056, ack 2511416865, win 65160, options [mss 1460,sackOK,TS val 2003052615 ecr 2349838492,nop,wscale 7], length 0
+18:02:52.563269 IP 10.200.2.63.58096 &gt; 10.200.2.65.80: Flags [R], seq 2511416865, win 0, length 0
+</code></pre><ul><li>In the first two lines we can see two identical entries, made in the same nanosecond, where a syn packet is sent from our debug pod&rsquo;s IP to the NGiNX service&rsquo;s Cluster IP. Why <em>two</em>?</li><li>We then see another two lines, this time a few nanoseconds apart, which are going from our debug pod IP to the <em>target</em> pod&rsquo;s IP. How did this happen? How did we go from Cluster IP to Pod IP? What part of the system knows about that mapping?</li><li>Next are two acknowledgement packets (<code>S.</code>) coming from the target Pod IP back to our debug Pod IP.</li><li>Finally, we see a reset being sent from our debug pod to the target pod directly, presumably because <code>curl</code> has no idea why it&rsquo;s getting replies from the wrong IP address.</li></ul><p>There were a few questions raised above - first and foremost, why are we seeing packets logged twice? The first two lines are logged in the same nanosecond, and they all have the same sequence ID until the ack, so its effectively the same packet being routed through different places.</p><p>We performed another <code>tcpdump</code>, this time with the <code>-e</code> flag that prints link-layer headers, so that we can see the MAC address of each interface through which the packet is logged:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# tcpdump -nn -e -i any port 80
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on any, link-type LINUX_SLL (Linux cooked), capture size 262144 bytes
+18:05:28.708256   P 9e:d4:7d:ec:b7:6d ethertype IPv4 (0x0800), length 76: 10.200.2.63.58488 &gt; 10.32.0.102.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708256  In 9e:d4:7d:ec:b7:6d ethertype IPv4 (0x0800), length 76: 10.200.2.63.58488 &gt; 10.32.0.102.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708319 Out 12:e9:35:7a:5b:02 ethertype IPv4 (0x0800), length 76: 10.200.2.63.58488 &gt; 10.200.2.65.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708323 Out 12:e9:35:7a:5b:02 ethertype IPv4 (0x0800), length 76: 10.200.2.63.58488 &gt; 10.200.2.65.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708343   P fa:ce:1c:2d:05:eb ethertype IPv4 (0x0800), length 76: 10.200.2.65.80 &gt; 10.200.2.63.58488: Flags [S.], seq 3216518151, ack 2308927168, win 65160, options [mss 1460,sackOK,TS val 2003208761 ecr 2349994637,nop,wscale 7], length 0
+18:05:28.708345 Out fa:ce:1c:2d:05:eb ethertype IPv4 (0x0800), length 76: 10.200.2.65.80 &gt; 10.200.2.63.58488: Flags [S.], seq 3216518151, ack 2308927168, win 65160, options [mss 1460,sackOK,TS val 2003208761 ecr 2349994637,nop,wscale 7], length 0
+18:05:28.708354   P 9e:d4:7d:ec:b7:6d ethertype IPv4 (0x0800), length 56: 10.200.2.63.58488 &gt; 10.200.2.65.80: Flags [R], seq 2308927168, win 0, length 0
+</code></pre><p>Now we&rsquo;ve got MAC addresses logged, we need to find out which interfaces these MAC addresses belong to, using <code>ip a s</code>.</p><p>First, on the worker in the root namespace:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# ip a s
+[SNIP!]
+3: cnio0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 12:e9:35:7a:5b:02 brd ff:ff:ff:ff:ff:ff
+    inet 10.200.2.1/24 brd 10.200.2.255 scope global cnio0
+</code></pre><p>Next, we need to find the MAC addresses of the interfaces in each pod. We can&rsquo;t currently see those in our session on the worker, as they&rsquo;re in separate network namespaces.</p><p>We used our interactive session to get the MAC address of the debug pod:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@tmp2:/# ip a s
+[SNIP!]
+3: eth0@if6: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+    link/ether 9e:d4:7d:ec:b7:6d brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 10.200.2.41/24 brd 10.200.2.255 scope global eth0
+</code></pre><p>Next we needed to get the MAC address of the NGiNX pod that we were trying to hit.</p><h3 id=nsenter>nsenter</h3><p>The NGiNX image is pragmatically minimal, meaning that the <code>ip</code> command isn&rsquo;t available there. Thankfully we can use <code>nsenter</code> to run a command from our root worker session, and execute it in the context of another process&rsquo; namespace. First we need to get the NGiNX PID, and then we can run a command in its network namespace:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# ps aux | grep &#34;[n]ginx: master&#34;
+root      2595  0.0  0.0  10628  5280 ?        Ss   10:44   0:00 nginx: master process nginx -g daemon off;
+root@worker-0:~# nsenter -t 2595 -n -- ip a s
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+[SNIP!]
+3: eth0@if4: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+    link/ether fa:ce:1c:2d:05:eb brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 10.200.2.51/24 brd 10.200.2.255 scope global eth0
+</code></pre><p>Here&rsquo;s the <code>tcpdump</code> output with MAC addresses substituted for readability&rsquo;s sake:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# tcpdump -nn -e -i any port 80
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on any, link-type LINUX_SLL (Linux cooked), capture size 262144 bytes
+18:05:28.708256   P DEBUG_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.41.58488 &gt; 10.32.0.117.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708256  In DEBUG_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.41.58488 &gt; 10.32.0.117.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708319 Out BRIDGE_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.41.58488 &gt; 10.200.2.51.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708323 Out BRIDGE_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.41.58488 &gt; 10.200.2.51.80: Flags [S], seq 2308927167, win 64240, options [mss 1460,sackOK,TS val 2349994637 ecr 0,nop,wscale 7], length 0
+18:05:28.708343   P NGINX_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.51.80 &gt; 10.200.2.41.58488: Flags [S.], seq 3216518151, ack 2308927168, win 65160, options [mss 1460,sackOK,TS val 2003208761 ecr 2349994637,nop,wscale 7], length 0
+18:05:28.708345 Out NGINX_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.51.80 &gt; 10.200.2.41.58488: Flags [S.], seq 3216518151, ack 2308927168, win 65160, options [mss 1460,sackOK,TS val 2003208761 ecr 2349994637,nop,wscale 7], length 0
+18:05:28.708354   P DEBUG_INTERFACE ethertype IPv4 (0x0800), length 56: 10.200.2.41.58488 &gt; 10.200.2.51.80: Flags [R], seq 2308927168, win 0, length 0
+</code></pre><p>We can see that:</p><ul><li>the first packet is logged twice on the debug pod&rsquo;s interface. The <code>P</code> in the second column suggest that this is because the interface is in promiscuous mode, but it is not - that would only happen if we ran <code>tcpdump</code> with the <code>-i</code> flag giving a <em>specific</em> interface, and we ran it in a mode that looks at all of them.</li><li>the packet passed from the debug pod interface to the <code>cnio0</code> bridge interface, by which time its destination has been translated to the target Pod IP</li><li>the target pod&rsquo;s interface responds (again, double-logging because of alleged promiscuity) directly to the debug pod, without going via the bridge</li></ul><p>Whilst writing up this blog post, we found <a href=https://kubernetes.io/blog/2019/03/29/kube-proxy-subtleties-debugging-an-intermittent-connection-reset/>a Google article</a> that describes a similar issue. Whilst our issue has a different cause, the diagram from that article explains why we see a TCP reset packet being sent:</p><p>Cluster IPs aren&rsquo;t &lsquo;real&rsquo;, and instead they appear only in the <code>iptables</code> rules that <code>kube-proxy</code> configures on each worker.</p><p>If we want to have any chance of understanding what&rsquo;s going on here, we&rsquo;re going to need to dig into <code>iptables</code>.</p><h3 id=iptables>iptables</h3><p><code>iptables</code> is an interface for <code>netfilter</code>, which does all sorts of clever packet-manipulation stuff in Linux. It&rsquo;s the mechanism via which Kubernetes creates Cluster IPs, and is also used by Envoy, and by Cloud Foundry&rsquo;s Diego in order to implement security groups.</p><p>There are four types of table:</p><ol><li>filter</li><li>nat</li><li>mangle</li><li>raw</li></ol><p>Using <code>iptables -L -t &lt;table></code>, we could see that there wasn&rsquo;t anything of interest in the <code>mangle</code> or <code>raw</code> tables. There&rsquo;s some Kubernetes-related stuff in the <code>filter</code> table, but we&rsquo;ll leave it out of this blog post as it&rsquo;s not relevant.</p><p><em>The default output format of <code>iptables</code> really sucks at lining up columns. You can pipe it into <code>columns -t</code> which makes things a bit better, but screws up the headings instead.</em></p><p><a href=https://gist.githubusercontent.com/DanielJonesEB/afa8095000d43756892120a37f3b0b61/raw/c89b9f18a2b9084a678262800057822b207d5e97/gistfile1.txt>You can see the whole output in this Gist</a>, but as it&rsquo;s fairly verbose, I&rsquo;ll highlight the more pertinent parts here.</p><h3 id=kube-services><code>KUBE-SERVICES</code></h3><pre tabindex=0><code class=language-terminal data-lang=terminal>Chain KUBE-SERVICES (2 references)
+target                        prot  opt  source          destination
+KUBE-MARK-MASQ                tcp   --   !10.200.0.0/16  10.32.0.1    /* default/kubernetes:https cluster IP */ tcp   dpt:https
+KUBE-SVC-NPX46M4PTMTKRN6Y     tcp   --   anywhere        10.32.0.1    /* default/kubernetes:https cluster IP */ tcp   dpt:https
+KUBE-MARK-MASQ                tcp   --   !10.200.0.0/16  10.32.0.101  /* default/nginx1: cluster IP */ tcp   dpt:http
+KUBE-SVC-253L2MOZ6TC5FE7P     tcp   --   anywhere        10.32.0.101  /* default/nginx1: cluster IP */ tcp   dpt:http
+[SNIP!]
+KUBE-MARK-MASQ                udp   --   !10.200.0.0/16  10.32.0.10   /* kube-system/kube-dns:dns cluster IP */ udp   dpt:domain
+KUBE-SVC-TCOU7JCQXEZGVUNU     udp   --   anywhere        10.32.0.10   /* kube-system/kube-dns:dns cluster IP */ udp   dpt:domain
+KUBE-MARK-MASQ                tcp   --   !10.200.0.0/16  10.32.0.10   /* kube-system/kube-dns:dns-tcp cluster IP */ tcp   dpt:domain
+KUBE-SVC-ERIFXISQEP7F7OF4     tcp   --   anywhere        10.32.0.10   /* kube-system/kube-dns:dns-tcp cluster IP */ tcp   dpt:domain
+KUBE-MARK-MASQ                tcp   --   !10.200.0.0/16  10.32.0.10   /* kube-system/kube-dns:metrics cluster IP */ tcp   dpt:9153
+KUBE-SVC-JD5MR3NA4I4DYORP     tcp   --   anywhere        10.32.0.10   /* kube-system/kube-dns:metrics cluster IP */ tcp   dpt:9153
+KUBE-NODEPORTS                all   --   anywhere        anywhere     /* kubernetes service nodeports; NOTE: this must be the last rule in this chain */ ADDRTYPE match dst-type LOCAL
+</code></pre><p>Unsurprisingly, the chain into which all the rules for Cluster IP services go. The last rule saves nodeport traffic from going out of the kernel.</p><h3 id=kube-mark-masq><code>KUBE-MARK-MASQ</code></h3><pre tabindex=0><code class=language-terminal data-lang=terminal>Chain KUBE-MARK-MASQ (2 references)
+target  prot  opt  source    destination
+MARK    all   --   anywhere  anywhere     MARK or 0x4000
+</code></pre><p>Tags packets (virtually, so only inside the kernel) so that they can be identified later.</p><h3 id=kube-svc-><code>KUBE-SVC-*</code></h3><pre tabindex=0><code class=language-terminal data-lang=terminal>Chain KUBE-SVC-SJ5YE6C53UPXD73I (2 references)
+target                        prot  opt      source    destination
+KUBE-SEP-4QSDQJ2XGBM3KIR7     all   --       anywhere  anywhere
+</code></pre><p>When there are multiple endpoints, packets are probabilistically distributed between them. That wasn&rsquo;t the case for our test NGiNX services, but here&rsquo;s an example of Kubernetes API server traffic being split three ways:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>Chain KUBE-SVC-NPX46M4PTMTKRN6Y (1 references)
+target                        prot  opt      source    destination
+KUBE-SEP-HFMBYHW5FO36NATD     all   --       anywhere  anywhere statistic mode random probability 0.33332999982
+KUBE-SEP-E6U6KEZPQBWVNUQ2     all   --       anywhere  anywhere statistic mode random probability 0.50000000000
+KUBE-SEP-WRZKKJS6MWEUDTA4     all   --       anywhere  anywhere
+</code></pre><h3 id=kube-sep-><code>KUBE-SEP-*</code></h3><pre tabindex=0><code class=language-terminal data-lang=terminal>Chain KUBE-SEP-4QSDQJ2XGBM3KIR7 (1 references)
+target          prot  opt  source       destination
+KUBE-MARK-MASQ  all   --   10.200.0.52  anywhere
+DNAT            tcp   --   anywhere     anywhere tcp to:10.200.0.52:80
+</code></pre><p>This chain translates the destination of a packet to the Cluster IP&rsquo;s corresponding pod IP. It <em>also</em> marks the packet <em>if</em> it originated from pod IP that it&rsquo;s DNATing to, which is of interest to us.</p><h3 id=chain-flow>Chain flow</h3><p>As we read it, our mental model was thus:</p><ol><li>Traffic comes into the system</li><li><code>KUBE-SERVICES</code>: if didn&rsquo;t come from the pod CIDR and it&rsquo;s going to a Cluster IP, mark it</li><li><code>KUBE-SERVICES</code>: if it&rsquo;s going to a Cluster IP, go to the <code>SVC</code> chain</li><li><code>KUBE-SVC-*</code>: if there&rsquo;s more than one endpoint, randomly distribute traffic</li><li><code>KUBE-SVC-*</code>: go to the <code>SEP</code> chain</li><li><code>KUBE-SEP-*</code>: if the packet came from this Cluster IP&rsquo;s corresponding pod IP, mark it</li><li><code>KUBE-SEP-*</code>: DNAT to the pod IP instead of the Cluster IP</li></ol><p>In order to see which chains traffic was really going through, Jonathan came up with a beast of a Bash one-liner to add a log entry into every chain, prepended with <code>EB</code>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=k>for</span> T in filter nat mangle raw security <span class=p>;</span> <span class=k>do</span> <span class=k>for</span> C in <span class=k>$(</span>iptables -t <span class=nv>$T</span> -L <span class=p>|</span> awk <span class=s1>&#39;$1~/^Chain/{print $2}&#39;</span><span class=k>)</span><span class=p>;</span> <span class=k>do</span> iptables -t <span class=nv>$T</span> -I <span class=nv>$C</span> -j LOG --log-prefix <span class=s2>&#34;EB </span><span class=nv>$T</span><span class=s2> </span><span class=nv>$C</span><span class=s2> &#34;</span> --log-tcp-options <span class=p>;</span> <span class=k>done</span><span class=p>;</span> <span class=k>done</span>
+</span></span></code></pre></div><p>For mere mortals such as I, here&rsquo;s that loop sensibly-formatted:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=k>for</span> TABLE in filter nat mangle raw security
+</span></span><span class=line><span class=cl><span class=k>do</span>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> CHAIN in <span class=k>$(</span>iptables -t <span class=nv>$TABLE</span> -L <span class=p>|</span> awk <span class=s1>&#39;$1~/^Chain/{print $2}&#39;</span><span class=k>)</span>
+</span></span><span class=line><span class=cl>  <span class=k>do</span>
+</span></span><span class=line><span class=cl>    iptables -t <span class=nv>$TABLE</span> -I <span class=s2>&#34;</span><span class=nv>$CHAIN</span><span class=s2>&#34;</span> -j LOG --log-prefix <span class=s2>&#34;EB </span><span class=nv>$TABLE</span><span class=s2> </span><span class=nv>$CHAIN</span><span class=s2> &#34;</span> --log-tcp-options<span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>done</span>
+</span></span><span class=line><span class=cl><span class=k>done</span>
+</span></span></code></pre></div><p><em>Note: you can delete the rules by changing the <code>-I</code> to <code>-D</code> in the <code>iptables</code> call.</em></p><p>Whilst doing this logging, we were reminded of Kubernetes&rsquo; wonderful convergent nature. Our changes were getting overwritten by <code>kube-proxy</code> every few seconds, so we had to stop that process.</p><p>The result of this was that we could now see how traffic was routed through <code>netfilter</code>:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# dmesg -c &amp;&amp; sleep 2 &amp;&amp; dmesg -c &gt; foo
+root@worker-0:~# head -n 1 foo
+[21256.871187] EB filter KUBE-FIREWALL IN=ens4 OUT= MAC=42:01:0a:f0:00:14:42:01:0a:f0:00:01:08:00 SRC=80.169.160.158 DST=10.240.0.20 LEN=52 TOS=0x00 PREC=0x00 TTL=52 ID=0 DF PROTO=TCP SPT=54400 DPT=22 WINDOW=3382 RES=0x00 ACK URGP=0 OPT (0101080A86E3DA04B75BBC44)
+</code></pre><p>We started logging, did the <code>curl</code> test during the sleep, and this was the resulting flow:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>EB raw PREROUTING
+EB mangle PREROUTING
+EB nat PREROUTING
+EB nat KUBE-SERVICES
+EB nat KUBE-SVC-4N57TFCL4MD7ZIN=cnio0
+EB nat KUBE-SEP-XB5L7FWMKIQFXIN=cnio0
+EB mangle FORWARD
+EB filter FORWARD
+EB filter KUBE-FORWARD
+EB filter KUBE-SERVICES
+EB security FORWARD
+EB mangle POSTROUTING
+EB nat POSTROUTING
+EB nat KUBE-POSTROUTING
+EB nat CNI-b7b31389524eeb0d17IN=
+</code></pre><p>We compared this to the <a href=https://upload.wikimedia.org/wikipedia/commons/3/37/Netfilter-packet-flow.svg>Packet flow in Netfilter and General Networking</a> diagram that Jonathan assured me was the stuff of legend.</p><p></p><p>You can see the flow that was taken in fetching luminous pink, along with some hand-drawn additions of the chains that Kubernetes had added:</p><p></p><p>This is all very well. We&rsquo;d seen a lot of how kube-proxy works under the hood, and gained a deeper understanding. But why is it broken?</p><p>It was time to start looking elsewhere for help.</p><p>After a lot of searching we found a <a href=https://github.com/kubernetes/kubernetes/issues/21613>GitHub issue</a> that described our issue exactly. The proposed solution there was to run <code>modprobe br_netfilter</code> on every machine running <code>kube-proxy</code>.</p><h3 id=soltion-2---modprobe-br_netfilter>Soltion 2 - modprobe br_netfilter</h3><p>Running <code>modprobe br_netfilter</code> alone wouldn&rsquo;t have been very satifying without understanding what it does. We found some <a href=http://ebtables.netfilter.org/documentation/bridge-nf.html>documentation that described its effects in more detail</a>. It enables <code>netfilter</code> to see traffic being routed via bridge interfaces.</p><p>We decided to do some before/after observation:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# ll /proc/sys/net
+total 0
+dr-xr-xr-x 1 root root 0 Feb 10 11:42 ./
+dr-xr-xr-x 1 root root 0 Feb 10 10:10 ../
+dr-xr-xr-x 1 root root 0 Feb 10 11:42 core/
+dr-xr-xr-x 1 root root 0 Feb 10 11:42 ipv4/
+dr-xr-xr-x 1 root root 0 Feb 10 11:42 ipv6/
+dr-xr-xr-x 1 root root 0 Feb 10 11:42 iw_cm/
+dr-xr-xr-x 1 root root 0 Feb 10 11:42 netfilter/
+-rw-r--r-- 1 root root 0 Feb 10 11:42 nf_conntrack_max
+dr-xr-xr-x 1 root root 0 Feb 10 11:42 unix/
+</code></pre><p>There&rsquo;s no <code>bridge</code> subdirectory there, as expected.</p><p>Next we ran <code>modprobe br_netfilter</code> and then checked to see what had been created:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# head /proc/sys/net/bridge/* ==&gt; /proc/sys/net/bridge/bridge-nf-call-arptables &lt;==
+1
+
+==&gt; /proc/sys/net/bridge/bridge-nf-call-ip6tables &lt;==
+1
+
+==&gt; /proc/sys/net/bridge/bridge-nf-call-iptables &lt;==
+1
+
+==&gt; /proc/sys/net/bridge/bridge-nf-filter-pppoe-tagged &lt;==
+0
+
+==&gt; /proc/sys/net/bridge/bridge-nf-filter-vlan-tagged &lt;==
+0
+
+==&gt; /proc/sys/net/bridge/bridge-nf-pass-vlan-input-dev &lt;==
+0
+</code></pre><p>As series of files, each presumably acting a toggle for various kernel features.</p><p>We tried the <code>curl</code> from our debug pod, attempting to hit the Cluster IP of the NGiNX service that is backed by a pod on the same worker, and this time it worked. Huzzah!</p><p>Just be sure we understood what was going on, we repeated the test on a different worker, this time just setting an individual flag via <code>echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables</code>. This worked, so now we knew exactly what feature was having an impact.</p><p>A combination of our exploration and reading the <code>ebtables</code> documentation suggests that some traffic going via the bridge interface was not eligible for some <code>iptables</code> filtering.</p><p>We ran <code>tcpdump</code> again to see how the flow of packets had changed (MAC addresses have been replaced for readability):</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# tcpdump -nn -i any -e port 80
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on any, link-type LINUX_SLL (Linux cooked), capture size 262144 bytes
+11:50:09.299564   P DEBUG_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.54.44898 &gt; 10.32.0.117.80: Flags [S], seq 3054985869, win 64240, options [mss 1460,sackOK,TS val 2160371900 ecr 0,nop,wscale 7], length 0
+11:50:09.299601 Out BRIDGE ethertype IPv4 (0x0800), length 76: 10.200.2.54.44898 &gt; 10.200.2.52.80: Flags [S], seq 3054985869, win 64240, options [mss 1460,sackOK,TS val 2160371900 ecr 0,nop,wscale 7], length 0
+11:50:09.299622 Out DEBUG_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.54.44898 &gt; 10.200.2.52.80: Flags [S], seq 3054985869, win 64240, options [mss 1460,sackOK,TS val 2160371900 ecr 0,nop,wscale 7], length 0
+11:50:09.299626 Out DEBUG_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.54.44898 &gt; 10.200.2.52.80: Flags [S], seq 3054985869, win 64240, options [mss 1460,sackOK,TS val 2160371900 ecr 0,nop,wscale 7], length 0
+11:50:09.299661   P NGINX_INTERFACE ethertype IPv4 (0x0800), length 76: 10.200.2.52.80 &gt; 10.200.2.54.44898: Flags [S.], seq 84449733, ack 3054985870, win 65160, options [mss 1460,sackOK,TS val 798906542 ecr 2160371900,nop,wscale 7], length 0
+11:50:09.299669 Out NGINX_INTERFACE ethertype IPv4 (0x0800), length 76: 10.32.0.117.80 &gt; 10.200.2.54.44898: Flags [S.], seq 84449733, ack 3054985870, win 65160, options [mss 1460,sackOK,TS val 798906542 ecr 2160371900,nop,wscale 7], length 0
+11:50:09.299682   P DEBUG_INTERFACE ethertype IPv4 (0x0800), length 68: 10.200.2.54.44898 &gt; 10.32.0.117.80: Flags [.], ack 1, win 502, options [nop,nop,TS val 2160371900 ecr 798906542], length 0
+11:50:09.299877   P NGINX_INTERFACE ethertype IPv4 (0x0800), length 68: 10.200.2.52.80 &gt; 10.200.2.54.44898: Flags [.], ack 76, win 509, options [nop,nop,TS val 798906542 ecr 2160371900], length 0
+</code></pre><p>There are a few differences here:</p><ul><li>most importantly, we see the synack (<code>S.</code>) packet coming out of the NGiNX pod&rsquo;s interface, with a destination of the debug pod&rsquo;s IP, but crucially with a <em>source</em> of the Cluster IP. Presumably this is <code>netfilter</code> working its wonders and doing some NAT on return packets.</li><li>there is no <code>In</code> packet going through debug pod interface, from the debug pod to the NGiNX pod IP</li></ul><p>When we looked at the flow of chains that were invoked in <code>netfilter</code>, we saw some additional hits:</p><pre tabindex=0><code class=language-terminal data-lang=terminal>root@worker-0:~# diff --side before after
+EB raw PREROUTING                        EB raw PREROUTING
+EB mangle PREROUTING                     EB mangle PREROUTING
+EB nat PREROUTING                        EB nat PREROUTING
+EB nat KUBE-SERVICES                     EB nat KUBE-SERVICES
+EB nat KUBE-SVC-4N57TFCL4MD7ZIN=cnio0    EB nat KUBE-SVC-4N57TFCL4MD7ZIN=cnio0
+EB nat KUBE-SEP-XB5L7FWMKIQFXIN=cnio0    EB nat KUBE-SEP-XB5L7FWMKIQFXIN=cnio0
+EB mangle FORWARD                        EB mangle FORWARD
+EB filter FORWARD                        EB filter FORWARD
+EB filter KUBE-FORWARD                   EB filter KUBE-FORWARD
+EB filter KUBE-SERVICES                  EB filter KUBE-SERVICES
+EB security FORWARD                      EB security FORWARD
+EB mangle POSTROUTING                    EB mangle POSTROUTING
+EB nat POSTROUTING                       EB nat POSTROUTING
+EB nat KUBE-POSTROUTING                  EB nat KUBE-POSTROUTING
+EB nat CNI-b7b31389524eeb0d17IN=         EB nat CNI-b7b31389524eeb0d17IN=
+                                       &gt; EB mangle FORWARD
+                                       &gt; EB filter FORWARD
+                                       &gt; EB filter KUBE-FORWARD
+                                       &gt; EB filter KUBE-SERVICES
+                                       &gt; EB security FORWARD
+                                       &gt; EB mangle POSTROUTING
+</code></pre><p>Comparing this back to the big <code>netfilter</code> diagram, it&rsquo;s clear there&rsquo;s something funny going on. We seen to jump from one of the <code>kube-proxy</code>-managed chains, right into the middle of the diagram to hit the <code>mangle</code> table&rsquo;s <code>FORWARD</code> chain again.</p><p></p><h2 id=phew>Phew!</h2><p>Like all great adventures, it was more about the journey than the destination. We got to exercise our network debugging skills, and learnt how <code>kube-proxy</code> <em>really</em> works under the hood.</p><p>There&rsquo;s a lot going on, and I&rsquo;d strongly recommend those without decent network debugging skills to opt for distributions of configuration and components that are known to work together.</p></div><div class="blog-page_banner clearfix"><div class=blog_banner-text><h2>Get in touch</h2><p>See how much we can help you.<br>Call <span>+44 (0) 20 7846 0140</span> or</br></p><a href=mailto:contact@engineerbetter.com class=cloud-btn2><p>Contact us <span>&#xe900;</span></p></a></div></div></section><footer><div class=footer-background></div><div class="footer_wrap clearfix"><div class=footer_column-list-desktop><ul class=list><li><a href=/how-we-work/><span>&mdash;</span> How we work</a></li><li><a href=/our-services/><span>&mdash;</span> Our services</a></li><li><a href=/success-stories/><span>&mdash;</span> Success stories</a></li><li><a href=/why-cloud-native/><span>&mdash;</span> Why Cloud-Native?</a></li><li><a href=/about-us/><span>&mdash;</span> About us</a></li></ul></div><div class=footer_column-list><ul class=list><li><a href=mailto:contact@engineerbetter.com><span>&mdash;</span> Contact us</a></li><li><a href=/blog/><span>&mdash;</span> Blog</a></li><li><a href=/join-our-team/><span>&mdash;</span> Join our team</a></li><li><a href=//www.iubenda.com/privacy-policy/8251825 class="iubenda-nostyle no-brand iubenda-embed" title="Privacy Policy"><span>&mdash;</span> Privacy Policy</a><script type=text/javascript>(function(e,t){var n=function(){var e=t.createElement("script"),n=t.getElementsByTagName("script")[0];e.src="//cdn.iubenda.com/iubenda.js",n.parentNode.insertBefore(e,n)};e.addEventListener?e.addEventListener("load",n,!1):e.attachEvent?e.attachEvent("onload",n):e.onload=n})(window,document)</script></li></ul></div><div class=footer_column-icon-wrap><a href=https://twitter.com/EngineerBetter class=footer_column-icon><img class=footer_column-icon-img alt=Brand src=/img/icon-twitter.png></a>
+<a href=https://github.com/EngineerBetter class=footer_column-icon><img class=footer_column-icon-img alt=Brand src=/img/icon-git-hub.png></a></div><div class=footer_column-text><p>&copy; Copyright EngineerBetter Ltd</p><p>Registered England & Wales 10141478</p></div></div></footer><script src="/js/jquery-1.11.3.min.js?v=4"></script>
+<script src=/js/site.js></script></body></html>
